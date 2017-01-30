@@ -70,7 +70,7 @@ def password_verified(password_input, verify_input):
     if password_input == verify_input:
         pass
     else:
-        pass
+        return False
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
@@ -92,26 +92,55 @@ class MainHandler(webapp2.RequestHandler):
 
         submit = "<p><form><input type='submit' value='submit'/></form></p>"
 
-        content = page_header + user + password + verify + email + submit + page_footer
+        space_error = self.request.get("space_error")
+        space_error_element = "<span class='error'> " + space_error + "</span>"
+
+        invalid_user = self.request.get("invalid_user")
+        invalid_user_element = "<span class='error'> " + invalid_user + "</span>"
+
+        invalid_password = self.request.get("invalid_password")
+        invalid_password_element = "<span class='error'> " + invalid_password + "</span>"
+
+        pass_not_verified = self.request.get("pass_not_verified")
+        pass_not_verified_element = "<span class'error'> " + pass_not_verified + "</span>"
+
+        invalid_email = self.request.get("invalid_email")
+        invalid_email_element = "<span class='error'> " + invalid_email + "</span>"
+
+        content = page_header + user + space_error_element + invalid_user_element + password + invalid_password_element + verify + pass_not_verified_element+ email + invalid_email_element + submit + page_footer
         self.response.write(content)
-
-
 
 
 class SignUp(webapp2.RequestHandler):
     """ Handles requests coming in to '/sign-up'"""
     def post(self):
         username = self.request.get("user_input")
+        if " " in user_input:
+            space_error = "Username cannot contain spaces.".format(user_input)
+            space_error_escaped = cgi.escape(space_error, quote=True)
+            self.redirect("/?space_error=" + space_error_escaped)
+        if valid_username == False:
+            invalid_user = "Username must contain between 3 and 20 characters. It can contain lower and uppercase, numbers _ and -, no period.".format(user_input)
+            self.redirect("/?invalid_user=" + invalid_user)
 
-        # USE THE FOLLOWING TO HELP BUILD
-        if new_movie == "" or new_movie == " ":
-            nomovie = "Please enter the name of the movie you want to watch.".format(new_movie)
-            nomovie_escaped = cgi.escape(nomovie, quote=True)
+        password = self.request.get("password_input")
+        if valid_password == False:
+            invalid_password = "Password contains invalid characters. Please try again."
+            self.redirect("/?invalid_password=" + invalid_password)
+        if password_verified == False:
+            pass_not_verified = "The password fields do not match."
+            self. redirect("/?pass_not_verified=" + pass_not_verified)
 
-            self.redirect("/?nomovie=" + nomovie_escaped)
+        email = self.request.get("email_input")
+        if valid_email == False:
+            invalid_email = "Email is not valid, it must be in this form:  abc@something.com...Please try again."
+            self.redirect("/?invalid_email=" + invalid_email)
+
+
 
 
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler)
+    ('/', MainHandler),
+    ('/', SignUp)
 ], debug=True)
