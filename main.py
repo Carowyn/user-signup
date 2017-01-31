@@ -74,23 +74,23 @@ def password_verified(password_input, verify_input):
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        user_label = "<form method='post'><label>Username: </label>"
-        user_input = "<input type='text' name='user'/></form>"
+        user_label = "<form action='/sign-up' method='post'><label>Username: </label>"
+        user_input = "<input type='text' name='user'/>"
         user = "<p>" + user_label + user_input + "</p>"
 
-        password_label = "<form method='post'><label>Password: </label>"
-        password_input = "<input type='password' name='password'/></form>"
+        password_label = "<label>Password: </label>"
+        password_input = "<input type='password' name='password'/>"
         password = "<p>" + password_label + password_input + "</p>"
 
-        verify_label = "<form method='post'><label>Verify Password: </label>"
-        verify_input = "<input type='password' name'verify'/></form>"
+        verify_label = "<label>Verify Password: </label>"
+        verify_input = "<input type='password' name'verify'/>"
         verify ="<p>" + verify_label + verify_input + "</p>"
 
-        email_label = "<form method='post'><label>Email (optional): </label>"
-        email_input = "<input type='text' name='email'/></form>"
+        email_label = "<label>Email (optional): </label>"
+        email_input = "<input type='text' name='email'/>"
         email = "<p>" + email_label + email_input + "</p>"
 
-        submit = "<p><form><input type='submit' value='submit'/></form></p>"
+        submit = "<p><input type='submit' value='submit'/></form></p>"
 
         space_error = self.request.get("space_error")
         space_error_element = "<span class='error'> " + space_error + "</span>"
@@ -114,33 +114,54 @@ class MainHandler(webapp2.RequestHandler):
 class SignUp(webapp2.RequestHandler):
     """ Handles requests coming in to '/sign-up'"""
     def post(self):
+        user_valid = False
         username = self.request.get("user_input")
-        if " " in user_input:
-            space_error = "Username cannot contain spaces.".format(user_input)
+        if " " in username:
+            space_error = "Username cannot contain spaces.".format(username)
             space_error_escaped = cgi.escape(space_error, quote=True)
             self.redirect("/?space_error=" + space_error_escaped)
-        if valid_username == False:
-            invalid_user = "Username must contain between 3 and 20 characters. It can contain lower and uppercase, numbers _ and -, no period.".format(user_input)
+        elif not valid_username(username):
+            invalid_user = "Username must contain between 3 and 20 characters. It can contain lower and uppercase, numbers _ and -, no period.".format(username)
             self.redirect("/?invalid_user=" + invalid_user)
+        else:
+            user_valid = True
 
+        pass_valid = False
         password = self.request.get("password_input")
-        if valid_password == False:
+        if not valid_password(password):
             invalid_password = "Password contains invalid characters. Please try again."
             self.redirect("/?invalid_password=" + invalid_password)
-        if password_verified == False:
+        elif not password_verified(password):
             pass_not_verified = "The password fields do not match."
             self. redirect("/?pass_not_verified=" + pass_not_verified)
-
+        else:
+            pass_valid = True
+            
+        email_valid = False
         email = self.request.get("email_input")
-        if valid_email == False:
+        if not valid_email(email):
             invalid_email = "Email is not valid, it must be in this form:  abc@something.com...Please try again."
             self.redirect("/?invalid_email=" + invalid_email)
+        else:
+            email_valid = True
+            #return email_valid
 
+        if user_valid and pass_valid and email_valid:
+            self.redirect("/welcome")
+
+class Welcome(webapp2.RequestHandler):
+    def post(self):
+        user = self.request.get(user_input)
+        email = self.request.get(email_input)
+        welcome = "Hello %s, thank you for signing up! We've added your email address as %s. Thank you!" % (user, email)
+        welcome_element = "<p class='wecome'>" + welcome + "</p>"
+        content = page_header + welcome_element + page_footer
 
 
 
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
-    ('/', SignUp)
+    ('/sign-up', SignUp),
+    ('/welcome', Welcome)
 ], debug=True)
