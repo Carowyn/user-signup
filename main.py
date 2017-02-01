@@ -157,7 +157,7 @@ class SignUp(webapp2.RequestHandler):
         elif not valid_username(user_escape):#error3
             invalid_user = "Username must contain between 3 and 20 characters (Upper, lower, _, -).".format(user_escape)
             self.redirect("/sign-up" + invalid_user)
-        else:
+        else:#valid
             user_valid = True
 
         # pull in password
@@ -172,7 +172,7 @@ class SignUp(webapp2.RequestHandler):
         elif not password_verified(password):#error6
             pass_not_verified = "The password fields do not match."
             self.redirect("/sign-up")
-        else:
+        else:#valid
             pass_valid = True
 
         # pull in email
@@ -181,6 +181,26 @@ class SignUp(webapp2.RequestHandler):
         if " " in email:#error7
             space_in_email = "Email cannot contain spaces."
             self.redirect("/sign-up")
-        if not valid_email(email):#error8
+        elif not valid_email(email):#error8
             invalid_email = "email is not valid, it must be in this form:  abc@something.com...Please try again."
             self.redirect("/sign-up")
+        else:#valid
+            email_valid = True
+
+        if user_valid and pass_valid and email_valid:#if all valid
+            self.redirect("/welcome")
+
+class Welcome(webapp2.RequestHandler):
+    """Handles requests coming into '/welcome'."""
+    def post(self):
+        user = self.request.get(user_input)
+        email = self.request.get(email_input)
+        welcome = "Hello %s, thank you for signing up! We've added your email address as %s. Thank you!" % (user, email)
+        welcome_element = "<p class='welcome'>" + welcome + "</p>"
+        content = build_head() + welcome_element + build_footer()
+
+app = webapp2.WSGIApplication([
+    ('/', MainHandler),
+    ('/sign-up', SignUp),
+    ('/welcome', Welcome)
+    ])
