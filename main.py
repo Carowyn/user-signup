@@ -83,7 +83,7 @@ def password_verified(password_input, verify_input):
     else:
         return False
 
-class main_handler(webapp2.RequestHandler):
+class MainHandler(webapp2.RequestHandler):
     def get(self):
         """First page that the user comes to. Handles the first GET request."""
         # sets up the Username field
@@ -109,4 +109,78 @@ class main_handler(webapp2.RequestHandler):
         # sets up the submit button
         submit = "<p><input type='submit' value='submit'/></form></p>"
 
-        content = build_head() + user + password + verify + email + submit + build_footer
+        #ERRORS GO HERE
+        error1 = self.request.get("no_username_error")
+        error1_element = "<span class='error'>" + error1 + "</span>" if error1 else ""
+
+        error2 = self.request.get("space_error")
+        error2_element = "<span class='error'>" + error1 + "</span>" if error2 else ""
+
+        error3 = self.request.get("invalid_user")
+        error3_element = "<span class='error'>" + error3 + "</span>" if error3 else ""
+
+        error4 = self.request.get("no_password_error")
+        error4_element = "<span class='error'>" + error4 + "</span>" if error4 else ""
+
+        error5 = self.request.get("invalid_password")
+        error5_element = "<span class='error'>" + error5 + "</span>" if error5 else ""
+
+        error6 = self.request.get("pass_not_verified")
+        error6_element = "<span class='error'>" + error6 + "</span>" if error6 else ""
+
+        error7 = self.request.get("space_in_email")
+        error7_element = "<span class='error'>" + error7 + "</span>" if error7 else ""
+
+        error8 = self.request.get("invalid_email")
+        error8_element = "<span class='error'>" + error8 + "</span>" if error8 else ""
+
+        content = build_head() + user + error1_element + error2_element + error3_element + password + error4_element + error5_element + verify + error6_element + email + error7_element + error8_element + submit + build_footer
+
+class SignUp(webapp2.RequestHandler):
+    """Handles requests coming into '/sign-up'."""
+    def post(self):
+        # set the validity values to False
+        user_valid = False
+        pass_valid = False
+        email_valid = False
+
+        # pull in username
+        username = self.request.get("user_input")
+        user_escape = cgi.escape(username, quote=True)
+        # check username validity
+        if user_escape == "":#error1
+            no_username_error = "A username is required.".format(user_escape)
+            self.redirect("/sign-up" + no_username_error)
+        elif " " in user_escape:#error2
+            space_error = "Username cannot contain spaces.".format(user_escape)
+            self.redirect("/sign-up" + space_error)
+        elif not valid_username(user_escape):#error3
+            invalid_user = "Username must contain between 3 and 20 characters (Upper, lower, _, -).".format(user_escape)
+            self.redirect("/sign-up" + invalid_user)
+        else:
+            user_valid = True
+
+        # pull in password
+        password = self.request.get("password_input")
+        # check password validity
+        if password == "":#error4
+            no_password_error = "A password is required.".format(password)
+            self.redirect("/sign-up)
+        elif not valid_password(password):#error5
+            invalid_password = "Password contains invalid characters. Please try again."
+            self.redirect("/sign-up")
+        elif not password_verified(password):#error6
+            pass_not_verified = "The password fields do not match."
+            self.redirect("/sign-up")
+        else:
+            pass_valid = True
+
+        # pull in email
+        email = self.request.get("email_input")
+        # check email validity
+        if " " in email:#error7
+            space_in_email = "Email cannot contain spaces."
+            self.redirect("/sign-up")
+        if not valid_email(email):#error8
+            invalid_email = "email is not valid, it must be in this form:  abc@something.com...Please try again."
+            self.redirect("/sign-up")
