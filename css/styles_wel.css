@@ -1,0 +1,35 @@
+body {
+    background-color: #000000;
+    color: #c6a769;
+    text-align: center;
+    margin: auto;
+}
+
+h1 {
+    padding: 15px;
+}
+
+footer {
+    text-align: center;
+    padding: 25px;
+    font-size: 1.1em;
+    margin: auto;
+}
+
+.welcome {
+    padding: 20px;
+    font-size: 1.25em;
+    background-color: #070707;
+    width: 36%;
+    margin: auto;
+    text-align: center;
+}
+
+#copy {
+    color: #c68100;
+}
+
+#user {
+    font-size: 1.3em;
+    color: #d8b368;
+}

@@ -29,7 +29,7 @@ page_header = """
 </head>
 <body>
     <h1>
-        <a href="/">User Sign-Up</a>
+        User Sign-Up
     </h1>
 """
 page_header_welcome = """
@@ -38,23 +38,23 @@ page_header_welcome = """
 <head>
     <meta charset='utf-8'>
     <link type="text/css" rel="stylesheet" href="normalize.css">
-    <link type="text/css" rel="stylesheet" href="styles_wel.css">
+    <link type="text/css" rel="stylesheet" href="css/styles_wel.css">
     <title>Welcome!</title>
 </head>
-<body>
+<body id='wel'>
     <h1>
-        Welcome!
+        <img src='http://itemsforsalebycallkeithcustomers.homestead.com/files/WelcomeSignStaredAnimated.gif'/>
     </h1>
 """
 page_footer = """
 </body>
 <footer>
     <address>
-        <p><br>Contents written by: <span id='myname'<b>Brittani Luce</b></span></p>
+        <p><br>Contents written by: <span id='myname'><b>Brittani Luce</b></span></p>
         <p>Written for: LaunchCode 101 -- User Sign-Up
         <p>Thank you for visiting!</p>
     </address>
-        <p>&#169;Brittani Luce, 2017
+        <p id='copy'>&#169;Brittani Luce, 2017
         <br><br></p>
 </footer>
 </html>
@@ -64,25 +64,27 @@ def build_form(username='', user_error='', password_error='', verify_password=''
     return """
         <div>
         <form method='post'>
-        	<p><label>*Username*: </label>
-        	<input type='text' name='user' value={username}></input></p>
+        	<p><label id='user'>*Username*: </label>
+        	<input id='userin' type='text' name='user' value={username}></input></p>
         	<p><span class="error">{user_error}</span></p>
 
-        	<p><label>*Password*: </label>
-        	<input type='password' name='password'/></p>
+        	<p><label id='pass'>*Password*: </label>
+        	<input id='passin' type='password' name='password'/></p>
         	<p><span class="error">{password_error}</span></p>
 
-        	<p><label>*Verify Password*: </label>
-        	<input type='password' name='verify'/></p>
+        	<p><label id='verif'>*Verify Password*: </label>
+        	<input id='verifin' type='password' name='verify'/></p>
         	<p><span class="error">{verify_password}</span></p>
 
-        	<p><label>Email: </label>
-        	<input type='text' name='email' value={email}></input></p>
+        	<p><label id='em'>Email: </label>
+        	<input id='emin' type='text' name='email' value={email}></input></p>
         	<p><span class="error">{email_error}</span></p>
             <br>
-            <br>
             <p><span id='req'>*Required Information*</span></p>
-        	<p><input type='submit' value='Let&apos;s&nbsp;Go!'/></p>
+        	<p><input type='submit' value='Let&apos;s&nbsp;Go!'/>
+            <br>
+            <br>
+            <button value='clear'><a id='clear' href='/'>Clear the Form</a></button></p>
         </form>
         </div>
         """.format(username=username, user_error=user_error, password_error=password_error,
@@ -169,12 +171,14 @@ class Welcome(webapp2.RequestHandler):
     def get(self):
         user = self.request.get("username")
         email = self.request.get("email")
-        user = "<strong>" + user + "</strong>"
+        if email == "":
+            email = "<em>No email provided.</em>"
+        user = "<span id='user'><strong>" + user + "</span></strong>"
         email = "<strong>" + email + "</strong>"
         welcome = "Hello %s, thank you for signing up!" % user
         message = "Watch for your welcome email soon!"
-        welcome_element = "<p class='welcome'>" + welcome + "</p>"
-        message_element = "<p class='msg'>" + message + "</p><p>Email:  " + email
+        welcome_element = "<p class='welcome'>" + welcome
+        message_element = "<br>" + message + "<br><br><br>Email:  " + email + "</p>"
         welcome_content = page_header_welcome + welcome_element + message_element + page_footer
         self.response.write(welcome_content)
 
