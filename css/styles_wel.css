@@ -3,6 +3,7 @@ body {
     color: #c6a769;
     text-align: center;
     margin: auto;
+    font-family: cursive;
 }
 
 h1 {
@@ -10,10 +11,11 @@ h1 {
 }
 
 footer {
+    color: #f4e5c6;
     text-align: center;
+    vertical-align: text-bottom;
     padding: 25px;
-    font-size: 1.1em;
-    margin: auto;
+    font-size: 0.9em;
 }
 
 .welcome {
